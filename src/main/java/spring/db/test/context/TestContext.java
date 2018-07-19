@@ -1,17 +1,26 @@
 package spring.db.test.context;
 
-import spring.db.test.controller.TestController;
+import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import spring.db.test.repository.TestRepository;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import spring.db.test.controller.TestController;
 
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
+import java.util.Properties;
+
 
 @Configuration
 @ComponentScan("spring.db.test")
+@EnableJpaRepositories
+@PropertySource("classpath:database.properties")
 public class TestContext {
     @Bean
     public DataSource dataSource(Environment environment) {
@@ -24,7 +33,29 @@ public class TestContext {
     }
 
     @Bean
-    public TestController testController() {
-        return new TestController();
+    public TestController testController(TestRepository testRepository) {
+        return new TestController(testRepository);
+    }
+
+    @Bean
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
+        Properties jpaProperties = new Properties();
+        jpaProperties.put("hibernate.show_sql", "true");
+        jpaProperties.put("hibernate.hbm2ddl.auto", "create");
+        jpaProperties.put("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
+
+        LocalContainerEntityManagerFactoryBean entityManagerFactory = new LocalContainerEntityManagerFactoryBean();
+        entityManagerFactory.setPackagesToScan("spring.db.test.entity");
+        entityManagerFactory.setDataSource(dataSource);
+        entityManagerFactory.setJpaProperties(jpaProperties);
+        entityManagerFactory.setPersistenceProvider(new HibernatePersistenceProvider());
+        return entityManagerFactory;
+    }
+
+    @Bean
+    JpaTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
+        JpaTransactionManager transactionManager = new JpaTransactionManager();
+        transactionManager.setEntityManagerFactory(entityManagerFactory);
+        return transactionManager;
     }
 }

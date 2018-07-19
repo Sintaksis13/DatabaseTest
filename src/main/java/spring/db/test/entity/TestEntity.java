@@ -3,11 +3,14 @@ package spring.db.test.entity;
 import javax.persistence.*;
 
 @Entity
+@Table(name = "TEST_ENTITY")
 public class TestEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
+    @Column(name = "name")
     private String name;
+    @Column(name = "surname")
     private String surname;
 
     public TestEntity() {
