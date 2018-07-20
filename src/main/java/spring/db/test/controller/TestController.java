@@ -10,7 +10,6 @@ import spring.db.test.context.TestRepository;
 import spring.db.test.entity.TestEntity;
 
 @Controller
-@RequestMapping(value = "/hello")
 public class TestController {
     private TestRepository testRepository;
 
@@ -18,22 +17,25 @@ public class TestController {
     public TestController(TestRepository testRepository) {
         this.testRepository = testRepository;
     }
-/*
-    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getAllEntitiesAsJson(int id) {
-        TestEntity entity = testRepository.findById(id).get();
 
-        return entity.getSurname();
-    }*/
-
-    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_XML_VALUE)
-    public @ResponseBody Iterable<TestEntity> getEntityByIdAsXml() {
+    @RequestMapping(value = "/getJson", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Iterable<TestEntity> getAllInJSON() {
         return testRepository.findAll();
     }
 
-    @RequestMapping(method = RequestMethod.POST)
-    public void addNewEntity(String name, String surname) {
+    @RequestMapping(value = "/getXml", method = RequestMethod.GET, produces = MediaType.APPLICATION_XML_VALUE)
+    @ResponseBody
+    public TestEntity getEntityByIdAsXml(int id) {
+        return testRepository.findById(id).get();
+    }
+
+    @RequestMapping(value = "/addEntity", method = RequestMethod.POST)
+    @ResponseBody
+    public String addNewEntity(String name, String surname) {
         TestEntity entity = new TestEntity(name, surname);
         testRepository.save(entity);
+        return "<h1>Entity was added to database!</h1>" +
+                "\n<p><a href=\"index.jsp\">Return</a></p>";
     }
 }
