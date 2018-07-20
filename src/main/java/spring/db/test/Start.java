@@ -13,7 +13,7 @@ public class Start {
         testController.addNewEntity("hello", "world");
         testController.addNewEntity("yes", "close");
 
-        System.out.println(testController.getEntityByIdAsXml(1));
+        System.out.println(testController.getEntityByIdAsXml());
 
         /*System.out.println(testController.getAllEntitiesAsJson(2));*/
     }
