@@ -10,6 +10,11 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.web.servlet.ViewResolver;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
+import org.springframework.web.servlet.view.JstlView;
 import spring.db.test.controller.TestController;
 
 import javax.persistence.EntityManagerFactory;
@@ -20,8 +25,18 @@ import java.util.Properties;
 @Configuration
 @ComponentScan("spring.db.test")
 @EnableJpaRepositories
+@EnableWebMvc
 @PropertySource("classpath:database.properties")
-public class TestContext {
+public class TestContext implements WebMvcConfigurer {
+    @Bean(name = "SpringAnnotation")
+    public ViewResolver viewResolver() {
+        InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
+        viewResolver.setViewClass(JstlView.class);
+        viewResolver.setPrefix("/WEB-INF/");
+        viewResolver.setSuffix(".jsp");
+        return viewResolver;
+    }
+
     @Bean
     public DataSource dataSource(Environment environment) {
         DriverManagerDataSource dataSourceConfig = new DriverManagerDataSource();
